@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  license:
+    name: License and source headers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apache-2.0 LICENSE and NOTICE are present
+        run: |
+          test -s LICENSE && grep -q "Apache License" LICENSE && grep -q "Version 2.0" LICENSE
+          test -s NOTICE
+      - name: Every source file carries an SPDX header
+        run: |
+          missing=$(git ls-files '*.c' '*.h' '*.py' '*.mjs' '*.sh' 'Makefile' ':!firmware/pico_bridge/test/vectors.h' | xargs grep -L "SPDX-License-Identifier: Apache-2.0" || true)
+          test -z "$missing" || { echo "missing SPDX header:"; echo "$missing"; exit 1; }
+
+  host-tests:
+    name: Decoder and routing tests (host, with sanitizers)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: make -C firmware/pico_bridge/test
+
+  converter:
+    name: Zigbee2MQTT converter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --check z2m/pico_bridge.mjs
+      - run: python3 -I z2m/make_payload.py > /dev/null
+
+  firmware-build:
+    name: Firmware builds (ESP-IDF)
+    runs-on: ubuntu-latest
+    container: espressif/idf:v6.0.2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        shell: bash
+        run: |
+          . $IDF_PATH/export.sh
+          idf.py -C firmware/pico_bridge set-target esp32c6
+          idf.py -C firmware/pico_bridge build

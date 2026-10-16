@@ -1,0 +1,18 @@
+lutbridge-esp32: a receive-only Lutron Pico to Zigbee bridge for the ESP32-C6
+Copyright 2026 Dave Hammer
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Trademarks. Lutron, Caseta, Pico and Clear Connect are trademarks of Lutron Electronics Co., Inc. Zigbee is a
+trademark of the Connectivity Standards Alliance. Home Assistant and Zigbee2MQTT are projects of their respective
+communities. This project is independent: it is not affiliated with, endorsed by, or supported by any of them, and
+the names are used only to say what it works with.
+
+Acknowledgements.
+ - The CRC-16 variant that Pico frames use (polynomial 0xCA0F, the byte added into the low half of the register, no
+   final flush) was worked out independently from captured frames. It was found afterwards to match the update in
+   Entropy512's lutron_hacks (urh_captures/decode_lutron.py), which is credited here as independent confirmation. No
+   code from that project is included.
+ - Built on ESP-IDF and espressif/esp-zigbee-lib (both Apache-2.0), which are downloaded at build time and not
+   included in this repository.
+ - Works with Zigbee2MQTT through an external converter.

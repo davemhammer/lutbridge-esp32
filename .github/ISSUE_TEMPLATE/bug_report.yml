@@ -1,0 +1,23 @@
+name: Bug report
+description: Something does not work as described
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Firmware version or commit, ESP-IDF version, Zigbee2MQTT version, board and CC1101 module.
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Serial log
+      description: Output of `python3 firmware/serial_log.py 60` while reproducing (press the Pico a few times).
+      render: text
